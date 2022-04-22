@@ -106,7 +106,7 @@ Note, the ReferencePolicy should be created in the same namespace that it is all
 
 <CodeBlockConfig filename="referencepolicy.yaml">
 
-
+```yaml
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: ReferencePolicy
 metadata:
@@ -124,6 +124,8 @@ spec:
     - group: ""
       kind: Service
       name: web-backend
+</div>
+```
 </CodeBlockConfig>
 
 Edit your ReferencePolicy so all routes are allowed and then save into a file called referencepolicy.yaml
