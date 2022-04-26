@@ -153,7 +153,7 @@ If after inspecting your routes, your list is empty, you may skip to the last st
 
 ##### Method 2: Using jq
 
-Get all HTTPRoutes and TCPRoutes, using jq to filter for routes that require a ReferencePolicy.
+Get all HTTPRoutes and TCPRoutes, using [jq](https://stedolan.github.io/jq/) to filter for routes that require a ReferencePolicy.
 
 ```shell-session
 $ kubectl get HTTPRoute,TCPRoute -o json -A | jq -r '.items[] | {name: .metadata.name, namespace: .metadata.namespace, kind: .kind, crossNamespaceBackendReferences: ( .metadata.namespace as $parentnamespace | .spec.rules[] .backendRefs[] | select(.namespace != null and .namespace != $parentnamespace )  )} '
