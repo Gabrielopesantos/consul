@@ -125,8 +125,8 @@ For each of the above defined routes, you will need to inspect each of the backe
 
 If there is no namespace field defined or the namespace matches the namespace defined on the route, that backendRef requires no further action.
 
-If there is a namespace defined and it does not match the namespace defined on the route, make a note of the backendRef's Kind, Group, Name, Namespace as well as the Kind and Namespace of the route.
-You will need to use those later. Keep going until you have a list of all routes that require a reference policy. The above output would yield a list that looks as follows.
+If the `backendRef` does have a namespace defined and it does not match the namespace of the parent route, make a note of the backendRef's `group`, `kind`, `name`, and `namespace`, as well as the `kind` and `namespace` of the parent route.
+You will need these later. Keep going until you have a list of all routes that match this criteria. The routes above would yield the following:
 
 ```yaml
 
