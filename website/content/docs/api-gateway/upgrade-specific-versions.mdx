@@ -10,14 +10,18 @@ description: >-
 
 # Upgrading Specific Versions
 
+This guide explains how to upgrade a Consul API Gateway deployment running a specific version
+that requires additional steps from the standard upgrade path.
+
+Note: As of writing, v0.1.0 is the only previous release. A standardized upgrade path will be documented with future releases.
+
 
 ## Consul API Gateway v0.1.0
 
-This guide explains how to best upgrade a Consul API Gateway deployment that is currently
-running v0.1.0 to all future versions. v0.2.0 introduced a breaking change that
-causes routes defined with a BackendRef defined in a different namespace to
+Consul API Gateway v0.2.0 introduced a breaking change that causes routes with a BackendRef defined in a different namespace to
 require a [ReferencePolicy](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.ReferencePolicy)
-that explicitly allows traffic from the route's namespace to the BackendRef's namespace.
+that explicitly allows traffic from the route's namespace to the BackendRef's namespace. This guide explains how to find all routes
+that require a ReferencePolicy and create a matching ReferencePolicy.
 
 
 
@@ -27,7 +31,6 @@ that explicitly allows traffic from the route's namespace to the BackendRef's na
 - **Optional** [jq](https://stedolan.github.io/jq/download/) is installed on the users CLI
 
 
-Note: As of writing, v0.1.0 is the only previous release. A standardized upgrade path will be documented with future releases.
 
 ### Pre-requisites
 
