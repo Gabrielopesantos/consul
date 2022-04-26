@@ -216,9 +216,6 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       namespace: example-namespace
-    - group: gateway.networking.k8s.io
-      kind: TCPRoute
-      namespace: a-different-namespace
   to:
     - group: ""
       kind: Service
@@ -227,7 +224,9 @@ spec:
 ```
 </CodeBlockConfig>
 
-Edit your ReferencePolicy so all routes are allowed and then save into a file called referencepolicy.yaml
+Edit your ReferencePolicy so your route is allowed and then save into a file called referencepolicy.yaml
+Note, Because each ReferencePolicy [only supports one to field and one from field](https://gateway-api.sigs.k8s.io/v1alpha2/api-types/referencepolicy/#api-design-decisions) you
+might need to create multiple ReferencePolicys.
 
 Run the following command to apply it to your cluster
 
