@@ -157,7 +157,7 @@ $ helm upgrade --values values.yaml --namespace consul --version <NEW_VERSION> h
 ```
 
 **6.** Refresh gateway deployments
-Because [the gateway class is immutable](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io%2fv1alpha2.GatewayClass), once you've upgraded your CRD installation, in order to see the effects on prexisting gateways, you will need to delete and recreate any gateways.
+A requirement of the Kubernetes Gateway API specification is that the settings of the [Gateway Class](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io%2fv1alpha2.GatewayClass) are only applied to a gateway when the gateway is created. For that reason, in order to see the effects on preexisting gateways, once you've upgraded your CRD installation,  you will need to delete and recreate any gateways.
 
 To accomplish this you can run the following two commands
 
