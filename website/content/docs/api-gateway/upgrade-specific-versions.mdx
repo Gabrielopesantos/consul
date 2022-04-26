@@ -24,7 +24,8 @@ that explicitly allows traffic from the route's namespace to the BackendRef's na
 ## Requirements
 
 - The consul-api-gateway should be running version v0.1.0. If the version is different, follow the normal upgrade path.
-- [jq](https://stedolan.github.io/jq/download/) is installed on the users CLI
+- **Optional** [jq](https://stedolan.github.io/jq/download/) is installed on the users CLI
+
 
 Note, as of writing, this is the only upgrade path documented as v0.1.0 is the only currently released version. Normal upgrade path will be documented
 in future releases
@@ -40,24 +41,122 @@ In order to follow this guide, the following conditions must be true:
 
 ## Procedures
 
+
+
 **1.** Optional, double check the current version of the consul-api-gateway with the following command:
 
-```
+```shell-session
 $ kubectl get deployment --namespace consul consul-api-gateway-controller --output=jsonpath= "{@.spec.template.spec.containers[?(@.name=='api-gateway-controller')].image}"
 ```
 
-If the output looks as follows
+If the output looks as follows:
 
 ```log
 "hashicorp/consul-api-gateway:0.1.0"
 ```
 
- continue following this upgrade path.
+ Continue following this upgrade path.
 
-**2.** Run the following command to retrieve all routes defined with a cross namespace:
+**2.** Retrieve all routes defined with a cross namespace:
+
+There are two ways you can retrieve your cross namespace routes defined below.
+Method 1 which is manual but requires no additional dependencies, and method 2
+which is faster, but requires jq to be installed on your cli.
+
+##### Method 1: Manual
+
+Get all HTTPRoutes and TCPRoutes across all namespaces with the following command:
 
 ```shell-session
-$ kubectl get HttpRoute,TcpRoute -o json -A | jq -r '.items[] | {name: .metadata.name, namespace: .metadata.namespace, kind: .kind, crossNamespaceBackendReferences: ( .metadata.namespace as $parentnamespace | .spec.rules[] .backendRefs[] | select(.namespace != null and .namespace != $parentnamespace )  )} '
+$ kubectl get HTTPRoute,TCPRoute -o json -A
+```
+
+If you have any active HTTPRoutes or TCPRoutes, you should recieve output that looks as follows. Note, The output has been truncated to only show fields relevant to this guide.
+
+```yaml
+...
+
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1alpha2
+  kind: HTTPRoute
+  metadata:
+    name: example-http-route,
+    namespace: example-namespace,
+    ...
+  spec:
+    parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: gw-ns
+    rules:
+    - backendRefs:
+      - group: ""
+        kind: Service
+        name: web-backend
+        namespace: gateway-namespace
+        ...
+      ...
+- apiVersion: gateway.networking.k8s.io/v1alpha2
+  kind: TCPRoute
+  metadata:
+    name: example-tcp-route,
+    namespace: a-different-namespace,
+    ...
+  spec:
+    parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: gateway-namespace
+    rules:
+    - backendRefs:
+      - group: ""
+        kind: Service
+        name: web-backend
+        namespace: gateway-namespace
+        ...
+...
+
+```
+
+For each of the about defined routes, you will need to inspect each of the backendRefs.
+
+If there is no namespace field defined or the namespace matches the namespace defined on the route, that backendRef requires no further action.
+
+If there is a namespace defined and it does not match the namespace defined on the route, make a note of the backendRef's Kind, Group, Name, Namespace as well as the Kind and Namespace of the route.
+You will need to use those later. Keep going until you have a list of all routes that require a reference policy. The above output would yield a list that looks as follows.
+
+```yaml
+
+  example-http-route:
+    - namespace: example-namespace
+      kind: HTTPRoute
+      backendReferences:
+        - group : ""
+          kind: Service
+          name: web-backend
+          namespace: gateway-namespace
+
+  example-tcp-route:
+    - namespace: a-different-namespace
+      kind: HTTPRoute
+      backendReferences:
+        - group : ""
+          kind: Service
+          name: web-backend
+          namespace: gateway-namespace
+```
+
+If after inspecting your routes, your list is empty, you may skip to the last step.
+
+##### Method 2: Using jq
+
+Get all HTTPRoutes and TCPRoutes, using jq to filter for routes that require a ReferencePolicy.
+
+```shell-session
+$ kubectl get HTTPRoute,TCPRoute -o json -A | jq -r '.items[] | {name: .metadata.name, namespace: .metadata.namespace, kind: .kind, crossNamespaceBackendReferences: ( .metadata.namespace as $parentnamespace | .spec.rules[] .backendRefs[] | select(.namespace != null and .namespace != $parentnamespace )  )} '
 ```
 
 Note, the above command will retrieve all HTTPRoutes and TCPRoutes. TLSRoutes and UDPRoutes are not supported in v0.1.0.
@@ -66,7 +165,7 @@ If your output is empty, you can skip to the last step; otherwise, you have exis
 
 ```log
 {
-  "name": "example-breaking-http-route",
+  "name": "example-http-route",
   "namespace": "example-namespace",
   "kind": "HTTPRoute",
   "crossNamespaceBackendReferences": {
@@ -79,7 +178,7 @@ If your output is empty, you can skip to the last step; otherwise, you have exis
   }
 }
 {
-  "name": "example-breaking-tcp-route",
+  "name": "example-tcp-route",
   "namespace": "a-different-namespace",
   "kind": "TCPRoute",
   "crossNamespaceBackendReferences": {
@@ -95,7 +194,7 @@ If your output is empty, you can skip to the last step; otherwise, you have exis
 
 **3.** Create a ReferencePolicy to allow cross namespace traffic for each route service pair.
 
-Using the above output as a guide, create a [ReferencePolicy](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.ReferencePolicy) to allow cross namespace traffic.
+Using the list of routes you created earlier as a guide, create a [ReferencePolicy](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.ReferencePolicy) to allow cross namespace traffic.
 You will need to create a reference policy that explicitly allows each cross namespace route to service pair to prevent the route from breaking. If you've already created a ReferencePolicy you can skip this step.
 <!---
 TODO: add link to our docs on Cross Namespace Reference Policies, once we have written then, and tell the user to see them for more details on how to create these policies.
@@ -136,7 +235,7 @@ Run the following command to apply it to your cluster
 $ kubectl apply -f referencepolicy.yaml
 ```
 
-Repeat as needed until all of your cross namespace routes have defined reference policys.
+Repeat as needed until each of your cross namespace routes have a corresponding  reference policys.
 
 **4.** Upgrade your deployment to v.0.2.0.
 
