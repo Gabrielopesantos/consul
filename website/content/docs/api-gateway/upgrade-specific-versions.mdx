@@ -71,6 +71,8 @@ $ kubectl get HTTPRoute,TCPRoute -o json -A
 
 If you have any active HTTPRoutes or TCPRoutes, you should recieve output that looks as follows. Note, The output has been truncated to only show fields relevant to this guide.
 
+Note, the above command will retrieve all HTTPRoutes and TCPRoutes. TLSRoutes and UDPRoutes are not supported in v0.1.0.
+
 ```yaml
 ...
 
