@@ -232,7 +232,7 @@ Edit your ReferencePolicy so all routes are allowed and then save into a file ca
 Run the following command to apply it to your cluster
 
 ```shell-session
-$ kubectl apply -f referencepolicy.yaml
+$ kubectl apply --filename referencepolicy.yaml
 ```
 
 Repeat as needed until each of your cross-namespace routes have a corresponding ReferencePolicy.
