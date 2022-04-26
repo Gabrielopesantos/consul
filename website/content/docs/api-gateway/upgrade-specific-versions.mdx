@@ -21,7 +21,7 @@ that explicitly allows traffic from the route's namespace to the BackendRef's na
 
 
 
-## Requirements
+### Requirements
 
 - The consul-api-gateway should be running version v0.1.0. If the version is different, follow the normal upgrade path.
 - **Optional** [jq](https://stedolan.github.io/jq/download/) is installed on the users CLI
@@ -29,7 +29,7 @@ that explicitly allows traffic from the route's namespace to the BackendRef's na
 
 Note: As of writing, v0.1.0 is the only previous release. A standardized upgrade path will be documented with future releases.
 
-## Pre-requisites
+### Pre-requisites
 
 In order to follow this guide, the following conditions must be true:
 
@@ -38,7 +38,7 @@ In order to follow this guide, the following conditions must be true:
 - You have HTTPRoute.read, TCPRoute.read and ReferencePolicy.create rights on your Kubernetes cluster
 
 
-## Procedures
+### Procedures
 
 **1.** Optional, double check the current version of the consul-api-gateway with the following command:
 
@@ -274,6 +274,6 @@ $ kubectl create -f <path_to_gateway_config.yaml>
 gateway, it might take a long time for its attached routes to reconcile and start reporting bind errors.
 
 
-## Post-Upgrade Configuration Changes
+### Post-Upgrade Configuration Changes
 
 No configuration changes are required for this upgrade.
