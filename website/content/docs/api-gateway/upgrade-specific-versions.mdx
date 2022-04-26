@@ -247,7 +247,7 @@ $ kubectl apply --kustomize="github.com/hashicorp/consul-api-gateway/config/crd?
 
 Upgrade your consul installation using helm.
 
-~> This will call the API Gateway controller to be shut down and restart with the new version
+~> This will cause the Consul API Gateway controller to be shut down and restart with the new version
 
 ```shell-session
 $ helm upgrade --values values.yaml --namespace consul --version <NEW_VERSION> hashicorp/consul <DEPLOYMENT_NAME>
