@@ -195,7 +195,7 @@ If your output is empty, you can skip to the last step; otherwise, you have exis
 **3.** Create a ReferencePolicy to allow cross namespace traffic for each route service pair.
 
 Using the list of routes you created earlier as a guide, create a [ReferencePolicy](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.ReferencePolicy) to allow cross namespace traffic.
-You will need to create a reference policy that explicitly allows each cross namespace route to service pair to prevent the route from breaking. If you've already created a ReferencePolicy you can skip this step.
+You will need to create a ReferencePolicy that explicitly allows each cross-namespace route to service pair to prevent the route from breaking. If you've already created a ReferencePolicy, you can skip this step.
 <!---
 TODO: add link to our docs on Cross Namespace Reference Policies, once we have written then, and tell the user to see them for more details on how to create these policies.
 --->
