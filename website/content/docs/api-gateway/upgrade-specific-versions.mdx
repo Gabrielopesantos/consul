@@ -123,7 +123,7 @@ items:
 
 For each of the above defined routes, you will need to inspect each of the backendRefs.
 
-If there is no namespace field defined or the namespace matches the namespace defined on the route, that backendRef requires no further action.
+If a backendRef has no namespace field defined or the namespace matches the namespace of the route itself, that backendRef requires no further action.
 
 If the `backendRef` does have a namespace defined and it does not match the namespace of the parent route, make a note of the backendRef's `group`, `kind`, `name`, and `namespace`, as well as the `kind` and `namespace` of the parent route.
 You will need these later. Keep going until you have a list of all routes that match this criteria. The routes above would yield the following:
